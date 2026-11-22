@@ -15,3 +15,8 @@ export function addNote(notes: NoteList, text: string, now: number = Date.now())
   const note: Note = { id: `${now}-${notes.length}`, text: trimmed, createdAt: now };
   return [...notes, note];
 }
+
+/** Human-readable count, e.g. "1 note" or "3 notes". */
+export function countLabel(notes: NoteList): string {
+  return `${notes.length} ${notes.length === 1 ? "note" : "notes"}`;
+}
