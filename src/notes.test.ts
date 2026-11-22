@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addNote } from "./notes";
+import { addNote, countLabel } from "./notes";
 
 describe("addNote", () => {
   it("appends a trimmed note without mutating the input", () => {
@@ -12,5 +12,19 @@ describe("addNote", () => {
 
   it("rejects empty text", () => {
     expect(() => addNote([], "   ")).toThrow("must not be empty");
+  });
+});
+
+describe("countLabel", () => {
+  it("uses plural for zero notes", () => {
+    expect(countLabel([])).toBe("0 notes");
+  });
+
+  it("uses singular for one note", () => {
+    expect(countLabel(addNote([], "a", 1))).toBe("1 note");
+  });
+
+  it("uses plural for several notes", () => {
+    expect(countLabel(addNote(addNote([], "a", 1), "b", 2))).toBe("2 notes");
   });
 });
