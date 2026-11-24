@@ -19,3 +19,11 @@
 4. If you make a design decision, add `docs/adr/NNNN-<slug>.md` using
    `docs/adr/0000-template.md`. Pick the next free number.
 5. Before opening the PR, run: `pnpm typecheck && pnpm test && pnpm test:e2e`.
+
+## Running the checks
+- Run the checks above as one foreground command. The whole set takes under a
+  minute. Do not background it and do not `sleep` to wait for it.
+- `pnpm test:e2e` builds the app and serves it on a port derived from the
+  worktree path, so parallel worktrees never share a server. If it reports the
+  port is already in use, stop the process on that port. Do not set
+  `reuseExistingServer`, or you may test another ticket's build.
