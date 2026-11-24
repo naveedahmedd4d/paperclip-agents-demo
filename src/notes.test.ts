@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addNote, countLabel, noteTextError } from "./notes";
+import { addNote, countLabel, noteTextError, removeNote } from "./notes";
 
 describe("addNote", () => {
   it("appends a trimmed note without mutating the input", () => {
@@ -36,5 +36,19 @@ describe("noteTextError", () => {
   });
   it("returns null for valid text", () => {
     expect(noteTextError(" hi ")).toBeNull();
+  });
+});
+
+describe("removeNote", () => {
+  const list = addNote(addNote([], "a", 1), "b", 2);
+
+  it("removes the note with the given id without mutating the input", () => {
+    const result = removeNote(list, list[0].id);
+    expect(result.map((n) => n.text)).toEqual(["b"]);
+    expect(list).toHaveLength(2);
+  });
+
+  it("returns an equal list when the id is unknown", () => {
+    expect(removeNote(list, "nope")).toEqual(list);
   });
 });
