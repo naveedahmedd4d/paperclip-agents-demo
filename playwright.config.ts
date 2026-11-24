@@ -1,6 +1,14 @@
+import { createHash } from "node:crypto";
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 4173;
+// Each worktree gets its own preview port, so agents running e2e in parallel
+// worktrees never share (or silently reuse) another ticket's build.
+// E2E_PORT overrides it.
+const PORT_BASE = 4200;
+const PORT_RANGE = 700;
+const worktreePort =
+  PORT_BASE + (createHash("sha1").update(process.cwd()).digest().readUInt16BE(0) % PORT_RANGE);
+const PORT = Number(process.env.E2E_PORT) || worktreePort;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -14,9 +22,12 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: "pnpm build && pnpm preview",
+    // Type checking runs separately (`pnpm typecheck`), so build with Vite only.
+    command: `pnpm exec vite build && pnpm exec vite preview --host 127.0.0.1 --port ${PORT} --strictPort`,
     url: `http://127.0.0.1:${PORT}`,
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a server already on the port: it may be another worktree's
+    // build, and tests would pass or fail against the wrong code.
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });
