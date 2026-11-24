@@ -1,4 +1,4 @@
-import { addNote, countLabel, removeNote, type NoteList } from "./notes";
+import { addNote, countLabel, removeNote, noteTextError, type NoteList } from "./notes";
 
 const list = document.querySelector<HTMLUListElement>("#note-list");
 if (!list) throw new Error("#note-list missing from index.html");
@@ -28,5 +28,21 @@ function render(items: NoteList): void {
     }),
   );
 }
+
+const form = document.querySelector<HTMLFormElement>("#note-form");
+const input = document.querySelector<HTMLInputElement>("#note-input");
+const error = document.querySelector<HTMLParagraphElement>("#note-error");
+if (!form || !input || !error) throw new Error("note form missing from index.html");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const message = noteTextError(input.value);
+  error.textContent = message ?? "";
+  error.hidden = message === null;
+  if (message !== null) return;
+  notes = addNote(notes, input.value);
+  input.value = "";
+  render(notes);
+});
 
 render(notes);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addNote, countLabel, removeNote } from "./notes";
+import { addNote, countLabel, noteTextError,removeNote } from "./notes";
 
 describe("addNote", () => {
   it("appends a trimmed note without mutating the input", () => {
