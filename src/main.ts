@@ -3,16 +3,17 @@ import {
   countLabel,
   filterNotes,
   formatCreatedAt,
-  noteTextError,
+  noteTitleError,
   parseNotes,
   removeNote,
   serializeNotes,
+  type Note,
   type NoteList,
 } from "./notes";
 
 const STORAGE_KEY = "notes";
 
-const list = document.querySelector<HTMLUListElement>("#note-list");
+const list = document.querySelector<HTMLTableSectionElement>("#note-list");
 if (!list) throw new Error("#note-list missing from index.html");
 
 const count = document.querySelector<HTMLParagraphElement>("#note-count");
@@ -49,43 +50,65 @@ function update(next: { notes?: NoteList; query?: string }): void {
   render();
 }
 
+function cell(className: string, ...content: (Node | string)[]): HTMLTableCellElement {
+  const td = document.createElement("td");
+  td.className = className;
+  td.append(...content);
+  return td;
+}
+
+function emptyRow(): HTMLTableRowElement {
+  const tr = document.createElement("tr");
+  tr.className = "notes-empty";
+  const td = document.createElement("td");
+  td.colSpan = 4;
+  td.textContent = query.trim() ? "No notes match your search." : "No notes yet.";
+  tr.append(td);
+  return tr;
+}
+
+function noteRow(note: Note): HTMLTableRowElement {
+  const time = document.createElement("time");
+  time.className = "note-time";
+  time.dateTime = new Date(note.createdAt).toISOString();
+  time.textContent = formatCreatedAt(note);
+  const del = document.createElement("button");
+  del.type = "button";
+  del.textContent = "Delete";
+  del.setAttribute("aria-label", `Delete note: ${note.title}`);
+  del.addEventListener("click", () => update({ notes: removeNote(notes, note.id) }));
+  const tr = document.createElement("tr");
+  tr.append(
+    cell("note-title", note.title),
+    cell("note-body", note.body ?? ""),
+    cell("note-created", time),
+    cell("note-actions", del),
+  );
+  return tr;
+}
+
 function render(): void {
   count!.textContent = countLabel(notes);
-  list!.replaceChildren(
-    ...filterNotes(notes, query).map((note) => {
-      const li = document.createElement("li");
-      const text = document.createElement("span");
-      text.className = "note-text";
-      text.textContent = note.text;
-      const time = document.createElement("time");
-      time.className = "note-time";
-      time.dateTime = new Date(note.createdAt).toISOString();
-      time.textContent = formatCreatedAt(note);
-      const del = document.createElement("button");
-      del.type = "button";
-      del.textContent = "Delete";
-      del.setAttribute("aria-label", `Delete note: ${note.text}`);
-      del.addEventListener("click", () => update({ notes: removeNote(notes, note.id) }));
-      li.append(text, " ", time, del);
-      return li;
-    }),
-  );
+  const visible = filterNotes(notes, query);
+  list!.replaceChildren(...(visible.length === 0 ? [emptyRow()] : visible.map(noteRow)));
 }
 
 const form = document.querySelector<HTMLFormElement>("#note-form");
-const input = document.querySelector<HTMLInputElement>("#note-input");
+const titleInput = document.querySelector<HTMLInputElement>("#note-title");
+const bodyInput = document.querySelector<HTMLTextAreaElement>("#note-body");
 const error = document.querySelector<HTMLParagraphElement>("#note-error");
-if (!form || !input || !error) throw new Error("note form missing from index.html");
+if (!form || !titleInput || !bodyInput || !error) throw new Error("note form missing from index.html");
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  const message = noteTextError(input.value);
+  const message = noteTitleError(titleInput.value);
   error.textContent = message ?? "";
   error.hidden = message === null;
   if (message !== null) return;
-  const text = input.value;
-  input.value = "";
-  update({ notes: addNote(notes, text) });
+  const input = { title: titleInput.value, body: bodyInput.value };
+  titleInput.value = "";
+  bodyInput.value = "";
+  update({ notes: addNote(notes, input) });
 });
 
 search.addEventListener("input", () => update({ query: search.value }));
