@@ -197,3 +197,53 @@ td.notes-empty { border-bottom: 1px dashed var(--line-strong); }
   #notes-app *::before,
   #notes-app *::after { transition: none !important; animation: none !important; }
 }
+
+/* App header + Add Note dialog (ADR-0009) */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.app-brand { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; color: var(--fg); text-decoration: none; font-weight: 700; }
+.app-logo { display: grid; place-items: center; flex: none; width: 2rem; height: 2rem; background: var(--accent); color: var(--on-accent); border-radius: var(--radius-sm); font-family: Georgia, serif; }
+.app-brand-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-add-btn, .note-dialog-actions button {
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform var(--duration-fast) ease, border-color var(--duration-fast) ease;
+}
+.app-add-btn, .note-dialog-actions button[type="submit"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.app-add-btn:hover, .note-dialog-actions button:hover { transform: translateY(-1px); }
+.app-add-btn:active, .note-dialog-actions button:active { transform: none; }
+.app-add-btn:focus-visible, .note-dialog-actions button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+.note-dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  padding: var(--space-4);
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  box-sizing: border-box;
+}
+.note-dialog::backdrop { background: rgb(0 0 0 / 0.6); }
+.note-dialog h2 { margin: 0 0 var(--space-3); font-size: var(--text-lg); }
+.notes-form.notes-form-dialog { display: flex; flex-direction: column; align-items: stretch; padding-bottom: 0; border-bottom: 0; }
+.note-dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); }
+.notes-form-dialog [role="alert"] { margin: 0; color: var(--danger); }
+.note-dialog *, .note-dialog *::before, .note-dialog *::after { box-sizing: border-box; }
+@media (prefers-reduced-motion: reduce) {
+  .app-add-btn, .note-dialog-actions button { transition: none; }
+  .app-add-btn:hover, .note-dialog-actions button:hover { transform: none; }
+}

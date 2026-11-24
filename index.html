@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
+    <header class="app-header">
+      <a class="app-brand" href="#notes-app" aria-label="Notes App home"><span class="app-logo" aria-hidden="true">N</span><span class="app-brand-name">Notes App</span></a>
+      <button type="button" id="add-note-open" class="app-add-btn">Add Note</button>
+    </header>
     <header class="landing">
       <section class="landing-hero" aria-labelledby="landing-heading">
         <p class="landing-eyebrow">Plain notes, nothing else</p>
@@ -27,14 +31,20 @@
       <section id="notes-app" aria-labelledby="notes-heading">
         <h1 id="notes-heading">Notes App</h1>
         <p id="note-count" data-testid="note-count"></p>
-        <form id="note-form" class="notes-form" novalidate>
-          <label for="note-title">Title</label>
-          <input id="note-title" name="title" type="text" aria-describedby="note-error" autocomplete="off" />
-          <label for="note-body">Details</label>
-          <textarea id="note-body" name="body" rows="3"></textarea>
-          <button type="submit">Add</button>
-          <p id="note-error" role="alert" data-testid="note-error" hidden></p>
+        <dialog id="note-dialog" class="note-dialog" aria-labelledby="note-dialog-title">
+          <h2 id="note-dialog-title">Add Note</h2>
+          <form id="note-form" class="notes-form notes-form-dialog" novalidate>
+            <label for="note-title">Title</label>
+            <input id="note-title" name="title" type="text" aria-describedby="note-error" autocomplete="off" />
+            <label for="note-body">Details</label>
+            <textarea id="note-body" name="body" rows="3"></textarea>
+            <div class="note-dialog-actions">
+            <button type="button" id="note-cancel">Cancel</button>
+            <button type="submit">Add</button>
+            </div>
+            <p id="note-error" role="alert" data-testid="note-error" hidden></p>
         </form>
+        </dialog>
         <input id="search" type="search" placeholder="Search notes" aria-label="Search notes" />
         <table class="notes-table" aria-label="Notes">
           <thead>
