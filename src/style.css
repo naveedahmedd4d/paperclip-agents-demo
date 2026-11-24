@@ -1,4 +1,5 @@
 @import "./notes-ui.css";
+@import "./landing.css";
 
 :root {
   color-scheme: dark;
