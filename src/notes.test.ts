@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { addNote, countLabel, noteTextError, removeNote } from "./notes";
+import {
+  addNote,
+  countLabel,
+  filterNotes,
+  formatCreatedAt,
+  noteTextError,
+  parseNotes,
+  removeNote,
+  serializeNotes,
+} from "./notes";
 
 describe("addNote", () => {
   it("appends a trimmed note without mutating the input", () => {
@@ -50,5 +59,58 @@ describe("removeNote", () => {
 
   it("returns an equal list when the id is unknown", () => {
     expect(removeNote(list, "nope")).toEqual(list);
+  });
+});
+
+describe("filterNotes", () => {
+  const notes = addNote(addNote([], "Buy Milk", 1), "Call mom", 2);
+
+  it("matches case-insensitively by substring", () => {
+    expect(filterNotes(notes, "milk").map((n) => n.text)).toEqual(["Buy Milk"]);
+    expect(filterNotes(notes, "CALL").map((n) => n.text)).toEqual(["Call mom"]);
+  });
+
+  it("returns all notes for a blank query", () => {
+    expect(filterNotes(notes, "  ")).toHaveLength(2);
+  });
+
+  it("returns an empty list when nothing matches and does not mutate input", () => {
+    expect(filterNotes(notes, "zzz")).toHaveLength(0);
+    expect(notes).toHaveLength(2);
+  });
+});
+
+describe("persistence", () => {
+  const sample = [{ id: "1-0", text: "hi", createdAt: 1 }];
+
+  it("round-trips notes", () => {
+    expect(parseNotes(serializeNotes(sample))).toEqual(sample);
+  });
+
+  it.each([null, "", "{oops", "{}", "[1]", '[{"id":1,"text":"a","createdAt":1}]', '[{"id":"a","text":"a"}]'])(
+    "rejects invalid data %s",
+    (raw) => {
+      expect(parseNotes(raw)).toBeNull();
+    },
+  );
+
+  it("accepts an empty list", () => {
+    expect(parseNotes("[]")).toEqual([]);
+  });
+});
+
+describe("formatCreatedAt", () => {
+  const note = { id: "1", text: "x", createdAt: 1_000_000 };
+  const at = (ms: number) => formatCreatedAt(note, note.createdAt + ms);
+
+  it("says just now under a minute, including clock skew", () => {
+    expect(at(0)).toBe("just now");
+    expect(at(59_999)).toBe("just now");
+    expect(at(-5_000)).toBe("just now");
+  });
+  it("formats minutes, hours and days", () => {
+    expect(at(5 * 60_000)).toBe("5 min ago");
+    expect(at(3 * 3_600_000)).toBe("3 h ago");
+    expect(at(2 * 86_400_000)).toBe("2 d ago");
   });
 });

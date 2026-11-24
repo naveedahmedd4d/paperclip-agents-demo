@@ -1,4 +1,16 @@
-import { addNote, countLabel, removeNote, noteTextError, type NoteList } from "./notes";
+import {
+  addNote,
+  countLabel,
+  filterNotes,
+  formatCreatedAt,
+  noteTextError,
+  parseNotes,
+  removeNote,
+  serializeNotes,
+  type NoteList,
+} from "./notes";
+
+const STORAGE_KEY = "notes";
 
 const list = document.querySelector<HTMLUListElement>("#note-list");
 if (!list) throw new Error("#note-list missing from index.html");
@@ -6,24 +18,55 @@ if (!list) throw new Error("#note-list missing from index.html");
 const count = document.querySelector<HTMLParagraphElement>("#note-count");
 if (!count) throw new Error("#note-count missing from index.html");
 
-let notes: NoteList = addNote([], "Welcome to Notes");
+const search = document.querySelector<HTMLInputElement>("#search");
+if (!search) throw new Error("#search missing from index.html");
 
-function render(items: NoteList): void {
-  count!.textContent = countLabel(items);
+function load(): NoteList {
+  try {
+    const stored = parseNotes(localStorage.getItem(STORAGE_KEY));
+    if (stored) return stored;
+  } catch {
+    // storage unavailable: fall through to default
+  }
+  return addNote([], "Welcome to Notes");
+}
+
+function save(items: NoteList): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, serializeNotes(items));
+  } catch {
+    // storage full/unavailable: keep working in memory
+  }
+}
+
+let notes: NoteList = load();
+let query = "";
+
+function update(next: { notes?: NoteList; query?: string }): void {
+  notes = next.notes ?? notes;
+  query = next.query ?? query;
+  save(notes);
+  render();
+}
+
+function render(): void {
+  count!.textContent = countLabel(notes);
   list!.replaceChildren(
-    ...items.map((note) => {
+    ...filterNotes(notes, query).map((note) => {
       const li = document.createElement("li");
       const text = document.createElement("span");
+      text.className = "note-text";
       text.textContent = note.text;
+      const time = document.createElement("time");
+      time.className = "note-time";
+      time.dateTime = new Date(note.createdAt).toISOString();
+      time.textContent = formatCreatedAt(note);
       const del = document.createElement("button");
       del.type = "button";
       del.textContent = "Delete";
       del.setAttribute("aria-label", `Delete note: ${note.text}`);
-      del.addEventListener("click", () => {
-        notes = removeNote(notes, note.id);
-        render(notes);
-      });
-      li.append(text, del);
+      del.addEventListener("click", () => update({ notes: removeNote(notes, note.id) }));
+      li.append(text, " ", time, del);
       return li;
     }),
   );
@@ -40,9 +83,11 @@ form.addEventListener("submit", (event) => {
   error.textContent = message ?? "";
   error.hidden = message === null;
   if (message !== null) return;
-  notes = addNote(notes, input.value);
+  const text = input.value;
   input.value = "";
-  render(notes);
+  update({ notes: addNote(notes, text) });
 });
 
-render(notes);
+search.addEventListener("input", () => update({ query: search.value }));
+
+update({});
