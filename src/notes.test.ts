@@ -4,7 +4,7 @@ import {
   countLabel,
   filterNotes,
   formatCreatedAt,
-  noteTextError,
+  noteTitleError,
   parseNotes,
   removeNote,
   serializeNotes,
@@ -15,12 +15,18 @@ describe("addNote", () => {
     const before: ReturnType<typeof addNote> = [];
     const after = addNote(before, "  buy milk  ", 1);
     expect(after).toHaveLength(1);
-    expect(after[0]?.text).toBe("buy milk");
+    expect(after[0]?.title).toBe("buy milk");
     expect(before).toHaveLength(0);
   });
 
-  it("rejects empty text", () => {
-    expect(() => addNote([], "   ")).toThrow("must not be empty");
+  it("rejects an empty title", () => {
+    expect(() => addNote([], { title: "   " })).toThrow("must not be empty");
+  });
+
+  it("stores a trimmed optional body and omits a blank one", () => {
+    expect(addNote([], { title: "t", body: "  details " }, 1)[0]?.body).toBe("details");
+    expect(addNote([], { title: "t", body: "  " }, 1)[0]).not.toHaveProperty("body");
+    expect(addNote([], { title: "t" }, 1)[0]).not.toHaveProperty("body");
   });
 });
 
@@ -38,13 +44,13 @@ describe("countLabel", () => {
   });
 });
 
-describe("noteTextError", () => {
+describe("noteTitleError", () => {
   it("returns an error for empty or whitespace-only text", () => {
-    expect(noteTextError("")).not.toBeNull();
-    expect(noteTextError("   ")).not.toBeNull();
+    expect(noteTitleError("")).not.toBeNull();
+    expect(noteTitleError("   ")).not.toBeNull();
   });
   it("returns null for valid text", () => {
-    expect(noteTextError(" hi ")).toBeNull();
+    expect(noteTitleError(" hi ")).toBeNull();
   });
 });
 
@@ -53,7 +59,7 @@ describe("removeNote", () => {
 
   it("removes the note with the given id without mutating the input", () => {
     const result = removeNote(list, list[0].id);
-    expect(result.map((n) => n.text)).toEqual(["b"]);
+    expect(result.map((n) => n.title)).toEqual(["b"]);
     expect(list).toHaveLength(2);
   });
 
@@ -66,8 +72,13 @@ describe("filterNotes", () => {
   const notes = addNote(addNote([], "Buy Milk", 1), "Call mom", 2);
 
   it("matches case-insensitively by substring", () => {
-    expect(filterNotes(notes, "milk").map((n) => n.text)).toEqual(["Buy Milk"]);
-    expect(filterNotes(notes, "CALL").map((n) => n.text)).toEqual(["Call mom"]);
+    expect(filterNotes(notes, "milk").map((n) => n.title)).toEqual(["Buy Milk"]);
+    expect(filterNotes(notes, "CALL").map((n) => n.title)).toEqual(["Call mom"]);
+  });
+
+  it("matches the body too", () => {
+    const withBody = addNote([], { title: "a", body: "Secret sauce" }, 1);
+    expect(filterNotes(withBody, "sauce")).toHaveLength(1);
   });
 
   it("returns all notes for a blank query", () => {
@@ -81,18 +92,27 @@ describe("filterNotes", () => {
 });
 
 describe("persistence", () => {
-  const sample = [{ id: "1-0", text: "hi", createdAt: 1 }];
+  const sample = [{ id: "1-0", title: "hi", createdAt: 1 }];
 
   it("round-trips notes", () => {
     expect(parseNotes(serializeNotes(sample))).toEqual(sample);
   });
 
-  it.each([null, "", "{oops", "{}", "[1]", '[{"id":1,"text":"a","createdAt":1}]', '[{"id":"a","text":"a"}]'])(
+  it.each([null, "", "{oops", "{}", "[1]", '[{"id":1,"title":"a","createdAt":1}]', '[{"id":"a","title":"a"}]', '[{"id":"a","createdAt":1}]'])(
     "rejects invalid data %s",
     (raw) => {
       expect(parseNotes(raw)).toBeNull();
     },
   );
+
+  it("maps legacy text-only notes to title", () => {
+    expect(parseNotes('[{"id":"a","text":"old","createdAt":5}]')).toEqual([{ id: "a", title: "old", createdAt: 5 }]);
+  });
+
+  it("keeps a stored body and rejects a non-string body", () => {
+    expect(parseNotes('[{"id":"a","title":"t","body":"b","createdAt":5}]')?.[0]?.body).toBe("b");
+    expect(parseNotes('[{"id":"a","title":"t","body":3,"createdAt":5}]')).toBeNull();
+  });
 
   it("accepts an empty list", () => {
     expect(parseNotes("[]")).toEqual([]);
@@ -100,7 +120,7 @@ describe("persistence", () => {
 });
 
 describe("formatCreatedAt", () => {
-  const note = { id: "1", text: "x", createdAt: 1_000_000 };
+  const note = { id: "1", title: "x", createdAt: 1_000_000 };
   const at = (ms: number) => formatCreatedAt(note, note.createdAt + ms);
 
   it("says just now under a minute, including clock skew", () => {
