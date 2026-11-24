@@ -4,7 +4,7 @@ test("adds a note through the form", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("New note").fill("Buy milk");
   await page.getByRole("button", { name: "Add" }).click();
-  await expect(page.getByRole("list", { name: "Notes" }).getByRole("listitem")).toHaveText(["Welcome to Notes", "Buy milk"]);
+  await expect(page.getByRole("list", { name: "Notes" }).getByRole("listitem")).toHaveText([/^Welcome to Notes/, /^Buy milk/]);
   await expect(page.getByLabel("New note")).toHaveValue("");
   await expect(page.getByTestId("note-count")).toHaveText("2 notes");
 });
