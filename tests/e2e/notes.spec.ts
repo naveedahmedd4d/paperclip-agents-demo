@@ -24,3 +24,21 @@ test("deletes a note with its Delete button", async ({ page }) => {
   await expect(page.getByRole("list", { name: "Notes" }).getByRole("listitem")).toHaveCount(0);
   await expect(page.getByTestId("note-count")).toHaveText("0 notes");
 });
+
+test("notes survive a page reload", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() =>
+    localStorage.setItem("notes", JSON.stringify([{ id: "a", text: "Persisted note", createdAt: 1 }])),
+  );
+  await page.reload();
+  await expect(page.getByRole("list", { name: "Notes" }).getByRole("listitem")).toHaveText([/^Persisted note/]);
+  await page.reload();
+  await expect(page.getByTestId("note-count")).toHaveText("1 note");
+});
+
+test("falls back to the welcome note when stored data is invalid", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => localStorage.setItem("notes", "{broken"));
+  await page.reload();
+  await expect(page.getByRole("list", { name: "Notes" }).getByRole("listitem")).toHaveText([/^Welcome to Notes/]);
+});

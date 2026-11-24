@@ -37,3 +37,31 @@ export function filterNotes(notes: NoteList, query: string): NoteList {
   if (needle.length === 0) return notes;
   return notes.filter((note) => note.text.toLowerCase().includes(needle));
 }
+
+/** Serializes notes to a JSON string for storage. */
+export function serializeNotes(notes: NoteList): string {
+  return JSON.stringify(notes);
+}
+
+function isNote(value: unknown): value is Note {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.id === "string" &&
+    typeof v.text === "string" &&
+    typeof v.createdAt === "number" &&
+    Number.isFinite(v.createdAt)
+  );
+}
+
+/** Parses stored notes. Returns null for missing, malformed or invalid data; never throws. */
+export function parseNotes(raw: string | null): NoteList | null {
+  if (raw === null) return null;
+  try {
+    const data: unknown = JSON.parse(raw);
+    if (!Array.isArray(data) || !data.every(isNote)) return null;
+    return data.map(({ id, text, createdAt }) => ({ id, text, createdAt }));
+  } catch {
+    return null;
+  }
+}

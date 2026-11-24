@@ -1,4 +1,15 @@
-import { addNote, countLabel, filterNotes, noteTextError, removeNote, type NoteList } from "./notes";
+import {
+  addNote,
+  countLabel,
+  filterNotes,
+  noteTextError,
+  parseNotes,
+  removeNote,
+  serializeNotes,
+  type NoteList,
+} from "./notes";
+
+const STORAGE_KEY = "notes";
 
 const list = document.querySelector<HTMLUListElement>("#note-list");
 if (!list) throw new Error("#note-list missing from index.html");
@@ -9,12 +20,31 @@ if (!count) throw new Error("#note-count missing from index.html");
 const search = document.querySelector<HTMLInputElement>("#search");
 if (!search) throw new Error("#search missing from index.html");
 
-let notes: NoteList = addNote([], "Welcome to Notes");
+function load(): NoteList {
+  try {
+    const stored = parseNotes(localStorage.getItem(STORAGE_KEY));
+    if (stored) return stored;
+  } catch {
+    // storage unavailable: fall through to default
+  }
+  return addNote([], "Welcome to Notes");
+}
+
+function save(items: NoteList): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, serializeNotes(items));
+  } catch {
+    // storage full/unavailable: keep working in memory
+  }
+}
+
+let notes: NoteList = load();
 let query = "";
 
 function update(next: { notes?: NoteList; query?: string }): void {
   notes = next.notes ?? notes;
   query = next.query ?? query;
+  save(notes);
   render();
 }
 
