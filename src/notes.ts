@@ -20,3 +20,8 @@ export function addNote(notes: NoteList, text: string, now: number = Date.now())
 export function countLabel(notes: NoteList): string {
   return `${notes.length} ${notes.length === 1 ? "note" : "notes"}`;
 }
+
+/** Returns an error message for invalid note text, or null when valid. */
+export function noteTextError(text: string): string | null {
+  return text.trim().length === 0 ? "Note text must not be empty" : null;
+}
