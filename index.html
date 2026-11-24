@@ -8,15 +8,31 @@
   </head>
   <body>
     <main>
-      <h1>Notes</h1>
-      <p id="note-count" data-testid="note-count"></p>
-      <form id="note-form" novalidate>
-        <input id="note-input" name="note" type="text" aria-label="New note" aria-describedby="note-error" autocomplete="off" />
-        <button type="submit">Add</button>
-        <p id="note-error" role="alert" data-testid="note-error" hidden></p>
-      </form>
-      <input id="search" type="search" placeholder="Search notes" aria-label="Search notes" />
-      <ul id="note-list" aria-label="Notes"></ul>
+      <section id="notes-app" aria-labelledby="notes-heading">
+        <h1 id="notes-heading">Notes</h1>
+        <p id="note-count" data-testid="note-count"></p>
+        <form id="note-form" class="notes-form" novalidate>
+          <label for="note-title">Title</label>
+          <input id="note-title" name="title" type="text" aria-describedby="note-error" autocomplete="off" />
+          <label for="note-body">Details</label>
+          <textarea id="note-body" name="body" rows="3"></textarea>
+          <button type="submit">Add</button>
+          <p id="note-error" role="alert" data-testid="note-error" hidden></p>
+        </form>
+        <input id="search" type="search" placeholder="Search notes" aria-label="Search notes" />
+        <table class="notes-table">
+          <caption class="visually-hidden">Notes</caption>
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Details</th>
+              <th scope="col">Created</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="note-list"></tbody>
+        </table>
+      </section>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
