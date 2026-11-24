@@ -2,6 +2,7 @@ import {
   addNote,
   countLabel,
   filterNotes,
+  formatCreatedAt,
   noteTextError,
   parseNotes,
   removeNote,
@@ -54,13 +55,18 @@ function render(): void {
     ...filterNotes(notes, query).map((note) => {
       const li = document.createElement("li");
       const text = document.createElement("span");
+      text.className = "note-text";
       text.textContent = note.text;
+      const time = document.createElement("time");
+      time.className = "note-time";
+      time.dateTime = new Date(note.createdAt).toISOString();
+      time.textContent = formatCreatedAt(note);
       const del = document.createElement("button");
       del.type = "button";
       del.textContent = "Delete";
       del.setAttribute("aria-label", `Delete note: ${note.text}`);
       del.addEventListener("click", () => update({ notes: removeNote(notes, note.id) }));
-      li.append(text, del);
+      li.append(text, " ", time, del);
       return li;
     }),
   );
