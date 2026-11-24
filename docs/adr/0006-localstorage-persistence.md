@@ -1,4 +1,4 @@
-# ADR-0002: Persist notes in localStorage as validated JSON
+# ADR-0006: Persist notes in localStorage as validated JSON
 
 - Status: accepted
 - Date: 2026-11-24
