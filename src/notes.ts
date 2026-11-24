@@ -20,3 +20,8 @@ export function addNote(notes: NoteList, text: string, now: number = Date.now())
 export function countLabel(notes: NoteList): string {
   return `${notes.length} ${notes.length === 1 ? "note" : "notes"}`;
 }
+
+/** Returns a new list without the note with the given id. Never mutates the input. */
+export function removeNote(notes: NoteList, id: string): NoteList {
+  return notes.filter((note) => note.id !== id);
+}

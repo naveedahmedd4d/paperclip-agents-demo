@@ -1,4 +1,4 @@
-import { addNote, countLabel, type NoteList } from "./notes";
+import { addNote, countLabel, removeNote, type NoteList } from "./notes";
 
 const list = document.querySelector<HTMLUListElement>("#note-list");
 if (!list) throw new Error("#note-list missing from index.html");
@@ -13,7 +13,17 @@ function render(items: NoteList): void {
   list!.replaceChildren(
     ...items.map((note) => {
       const li = document.createElement("li");
-      li.textContent = note.text;
+      const text = document.createElement("span");
+      text.textContent = note.text;
+      const del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "Delete";
+      del.setAttribute("aria-label", `Delete note: ${note.text}`);
+      del.addEventListener("click", () => {
+        notes = removeNote(notes, note.id);
+        render(notes);
+      });
+      li.append(text, del);
       return li;
     }),
   );

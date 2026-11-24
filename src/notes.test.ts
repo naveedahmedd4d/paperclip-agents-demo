@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addNote, countLabel } from "./notes";
+import { addNote, countLabel, removeNote } from "./notes";
 
 describe("addNote", () => {
   it("appends a trimmed note without mutating the input", () => {
@@ -26,5 +26,19 @@ describe("countLabel", () => {
 
   it("uses plural for several notes", () => {
     expect(countLabel(addNote(addNote([], "a", 1), "b", 2))).toBe("2 notes");
+  });
+});
+
+describe("removeNote", () => {
+  const list = addNote(addNote([], "a", 1), "b", 2);
+
+  it("removes the note with the given id without mutating the input", () => {
+    const result = removeNote(list, list[0].id);
+    expect(result.map((n) => n.text)).toEqual(["b"]);
+    expect(list).toHaveLength(2);
+  });
+
+  it("returns an equal list when the id is unknown", () => {
+    expect(removeNote(list, "nope")).toEqual(list);
   });
 });
