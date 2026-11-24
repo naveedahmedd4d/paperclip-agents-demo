@@ -1,4 +1,4 @@
-# ADR-0002: Validate note text with a pure helper, not by catching addNote
+# ADR-0003: Validate note text with a pure helper, not by catching addNote
 
 - Status: accepted
 - Date: 2026-11-24
