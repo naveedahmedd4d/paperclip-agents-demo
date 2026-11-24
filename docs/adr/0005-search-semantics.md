@@ -1,4 +1,4 @@
-# ADR-0002: Search semantics and note count
+# ADR-0005: Search semantics and note count
 
 - Status: accepted
 - Date: 2026-11-24

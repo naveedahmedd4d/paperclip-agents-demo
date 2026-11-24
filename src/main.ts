@@ -6,15 +6,16 @@ if (!list) throw new Error("#note-list missing from index.html");
 const count = document.querySelector<HTMLParagraphElement>("#note-count");
 if (!count) throw new Error("#note-count missing from index.html");
 
-const search = document.querySelector<HTMLInputElement>("#note-search");
-if (!search) throw new Error("#note-search missing from index.html");
+const search = document.querySelector<HTMLInputElement>("#search");
+if (!search) throw new Error("#search missing from index.html");
 
 let notes: NoteList = addNote([], "Welcome to Notes");
+let query = "";
 
-function render(items: NoteList): void {
+function render(): void {
   count!.textContent = countLabel(notes);
   list!.replaceChildren(
-    ...items.map((note) => {
+    ...filterNotes(notes, query).map((note) => {
       const li = document.createElement("li");
       li.textContent = note.text;
       return li;
@@ -22,6 +23,12 @@ function render(items: NoteList): void {
   );
 }
 
-render(notes);
+function update(next: { notes?: NoteList; query?: string }): void {
+  notes = next.notes ?? notes;
+  query = next.query ?? query;
+  render();
+}
 
-search.addEventListener("input", () => render(filterNotes(notes, search.value)));
+update({});
+
+search.addEventListener("input", () => update({ query: search.value }));
