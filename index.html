@@ -7,7 +7,23 @@
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <main>
+    <header class="landing">
+      <section class="landing-hero" aria-labelledby="landing-heading">
+        <p class="landing-eyebrow">Plain notes, nothing else</p>
+        <h1 id="landing-heading" class="landing-title">Write it down. Find it later.</h1>
+        <p class="landing-tagline">A quiet place for the things you need to remember, saved right in your browser.</p>
+        <a class="landing-cta" href="#notes-app">Start taking notes</a>
+      </section>
+      <section class="landing-features" aria-labelledby="landing-features-heading">
+        <h2 id="landing-features-heading" class="landing-features-title">Why it works</h2>
+        <ul class="landing-feature-list">
+          <li><h3>Instant capture</h3><p>Type a note and press Enter. No accounts, no menus, no waiting.</p></li>
+          <li><h3>Search as you type</h3><p>Filter every note in real time, so the one you need is always a few keystrokes away.</p></li>
+          <li><h3>Stays on your device</h3><p>Notes live in your browser storage. Nothing is uploaded, and they are still there tomorrow.</p></li>
+        </ul>
+      </section>
+    </header>
+    <main id="notes-app">
       <h1>Notes</h1>
       <p id="note-count" data-testid="note-count"></p>
       <form id="note-form" novalidate>
