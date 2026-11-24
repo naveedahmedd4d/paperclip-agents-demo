@@ -1,4 +1,4 @@
-:root { --fg: #1d1d1f; --bg: #fafaf7; --accent: #3d5afe; font-family: system-ui, sans-serif; }
+:root { color-scheme: dark; --fg: #e8e8e6; --bg: #121214; --accent: #8c9eff; font-family: system-ui, sans-serif; }
 body { margin: 0; background: var(--bg); color: var(--fg); }
 main { max-width: 40rem; margin: 3rem auto; padding: 0 1rem; }
 #note-list { padding-left: 1.2rem; }
