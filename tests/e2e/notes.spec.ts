@@ -1,8 +1,14 @@
 import { expect, test } from "@playwright/test";
 
+test("shows the app name as page title and heading", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveTitle("Notes App");
+  await expect(page.getByRole("heading", { level: 1, name: "Notes App", exact: true })).toBeVisible();
+});
+
 test("shows the welcome note", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Notes" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Notes App", exact: true })).toBeVisible();
   await expect(page.locator(".notes-table .note-title")).toHaveText(["Welcome to Notes"]);
 });
 
