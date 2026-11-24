@@ -99,6 +99,23 @@ const bodyInput = document.querySelector<HTMLTextAreaElement>("#note-body");
 const error = document.querySelector<HTMLParagraphElement>("#note-error");
 if (!form || !titleInput || !bodyInput || !error) throw new Error("note form missing from index.html");
 
+const dialog = document.querySelector<HTMLDialogElement>("#note-dialog");
+const openButton = document.querySelector<HTMLButtonElement>("#add-note-open");
+const cancelButton = document.querySelector<HTMLButtonElement>("#note-cancel");
+if (!dialog || !openButton || !cancelButton) throw new Error("note dialog missing from index.html");
+
+openButton.addEventListener("click", () => {
+  dialog.showModal();
+  titleInput.focus();
+});
+cancelButton.addEventListener("click", () => dialog.close());
+// Fires for Cancel, Esc and successful add: reset form and error each time.
+dialog.addEventListener("close", () => {
+  form.reset();
+  error.textContent = "";
+  error.hidden = true;
+});
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   const message = noteTitleError(titleInput.value);
@@ -106,9 +123,8 @@ form.addEventListener("submit", (event) => {
   error.hidden = message === null;
   if (message !== null) return;
   const input = { title: titleInput.value, body: bodyInput.value };
-  titleInput.value = "";
-  bodyInput.value = "";
   update({ notes: addNote(notes, input) });
+  dialog.close();
 });
 
 search.addEventListener("input", () => update({ query: search.value }));
