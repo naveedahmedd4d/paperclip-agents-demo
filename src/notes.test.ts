@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addNote, countLabel } from "./notes";
+import { addNote, countLabel, parseNotes, serializeNotes } from "./notes";
 
 describe("addNote", () => {
   it("appends a trimmed note without mutating the input", () => {
@@ -26,5 +26,24 @@ describe("countLabel", () => {
 
   it("uses plural for several notes", () => {
     expect(countLabel(addNote(addNote([], "a", 1), "b", 2))).toBe("2 notes");
+  });
+});
+
+describe("persistence", () => {
+  const sample = [{ id: "1-0", text: "hi", createdAt: 1 }];
+
+  it("round-trips notes", () => {
+    expect(parseNotes(serializeNotes(sample))).toEqual(sample);
+  });
+
+  it.each([null, "", "{oops", "{}", "[1]", '[{"id":1,"text":"a","createdAt":1}]', '[{"id":"a","text":"a"}]'])(
+    "rejects invalid data %s",
+    (raw) => {
+      expect(parseNotes(raw)).toBeNull();
+    },
+  );
+
+  it("accepts an empty list", () => {
+    expect(parseNotes("[]")).toEqual([]);
   });
 });
