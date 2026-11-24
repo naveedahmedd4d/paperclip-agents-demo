@@ -25,3 +25,8 @@ export function countLabel(notes: NoteList): string {
 export function noteTextError(text: string): string | null {
   return text.trim().length === 0 ? "Note text must not be empty" : null;
 }
+
+/** Returns a new list without the note with the given id. Never mutates the input. */
+export function removeNote(notes: NoteList, id: string): NoteList {
+  return notes.filter((note) => note.id !== id);
+}
