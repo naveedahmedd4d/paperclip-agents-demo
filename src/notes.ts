@@ -21,6 +21,23 @@ export function countLabel(notes: NoteList): string {
   return `${notes.length} ${notes.length === 1 ? "note" : "notes"}`;
 }
 
+/** Returns an error message for invalid note text, or null when valid. */
+export function noteTextError(text: string): string | null {
+  return text.trim().length === 0 ? "Note text must not be empty" : null;
+}
+
+/** Returns a new list without the note with the given id. Never mutates the input. */
+export function removeNote(notes: NoteList, id: string): NoteList {
+  return notes.filter((note) => note.id !== id);
+}
+
+/** Case-insensitive substring filter. A blank query returns all notes. */
+export function filterNotes(notes: NoteList, query: string): NoteList {
+  const needle = query.trim().toLowerCase();
+  if (needle.length === 0) return notes;
+  return notes.filter((note) => note.text.toLowerCase().includes(needle));
+}
+
 /** Serializes notes to a JSON string for storage. */
 export function serializeNotes(notes: NoteList): string {
   return JSON.stringify(notes);
