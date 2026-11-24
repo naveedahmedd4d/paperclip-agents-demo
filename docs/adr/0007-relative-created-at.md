@@ -1,4 +1,4 @@
-# ADR-0002: Relative "created at" labels computed in a pure function
+# ADR-0007: Relative "created at" labels computed in a pure function
 
 - Status: accepted
 - Date: 2026-11-24

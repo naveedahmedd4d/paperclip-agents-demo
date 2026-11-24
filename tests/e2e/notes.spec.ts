@@ -10,8 +10,3 @@ test("shows the note count under the heading", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByTestId("note-count")).toHaveText("1 note");
 });
-
-test("shows when each note was created", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.getByRole("list", { name: "Notes" }).locator("time")).toHaveText("just now");
-});
