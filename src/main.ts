@@ -1,4 +1,4 @@
-import { addNote, countLabel, removeNote, noteTextError, type NoteList } from "./notes";
+import { addNote, countLabel, filterNotes, noteTextError, removeNote, type NoteList } from "./notes";
 
 const list = document.querySelector<HTMLUListElement>("#note-list");
 if (!list) throw new Error("#note-list missing from index.html");
@@ -6,12 +6,22 @@ if (!list) throw new Error("#note-list missing from index.html");
 const count = document.querySelector<HTMLParagraphElement>("#note-count");
 if (!count) throw new Error("#note-count missing from index.html");
 
-let notes: NoteList = addNote([], "Welcome to Notes");
+const search = document.querySelector<HTMLInputElement>("#search");
+if (!search) throw new Error("#search missing from index.html");
 
-function render(items: NoteList): void {
-  count!.textContent = countLabel(items);
+let notes: NoteList = addNote([], "Welcome to Notes");
+let query = "";
+
+function update(next: { notes?: NoteList; query?: string }): void {
+  notes = next.notes ?? notes;
+  query = next.query ?? query;
+  render();
+}
+
+function render(): void {
+  count!.textContent = countLabel(notes);
   list!.replaceChildren(
-    ...items.map((note) => {
+    ...filterNotes(notes, query).map((note) => {
       const li = document.createElement("li");
       const text = document.createElement("span");
       text.textContent = note.text;
@@ -19,10 +29,7 @@ function render(items: NoteList): void {
       del.type = "button";
       del.textContent = "Delete";
       del.setAttribute("aria-label", `Delete note: ${note.text}`);
-      del.addEventListener("click", () => {
-        notes = removeNote(notes, note.id);
-        render(notes);
-      });
+      del.addEventListener("click", () => update({ notes: removeNote(notes, note.id) }));
       li.append(text, del);
       return li;
     }),
@@ -40,9 +47,11 @@ form.addEventListener("submit", (event) => {
   error.textContent = message ?? "";
   error.hidden = message === null;
   if (message !== null) return;
-  notes = addNote(notes, input.value);
+  const text = input.value;
   input.value = "";
-  render(notes);
+  update({ notes: addNote(notes, text) });
 });
 
-render(notes);
+search.addEventListener("input", () => update({ query: search.value }));
+
+update({});
