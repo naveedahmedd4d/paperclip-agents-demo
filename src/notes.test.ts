@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addNote, countLabel, formatCreatedAt } from "./notes";
+import { addNote, countLabel, noteTextError,formatCreatedAt } from "./notes";
 
 describe("addNote", () => {
   it("appends a trimmed note without mutating the input", () => {
@@ -29,18 +29,12 @@ describe("countLabel", () => {
   });
 });
 
-describe("formatCreatedAt", () => {
-  const note = { id: "1", text: "x", createdAt: 1_000_000 };
-  const at = (ms: number) => formatCreatedAt(note, note.createdAt + ms);
-
-  it("says just now under a minute, including clock skew", () => {
-    expect(at(0)).toBe("just now");
-    expect(at(59_999)).toBe("just now");
-    expect(at(-5_000)).toBe("just now");
+describe("noteTextError", () => {
+  it("returns an error for empty or whitespace-only text", () => {
+    expect(noteTextError("")).not.toBeNull();
+    expect(noteTextError("   ")).not.toBeNull();
   });
-  it("formats minutes, hours and days", () => {
-    expect(at(5 * 60_000)).toBe("5 min ago");
-    expect(at(3 * 3_600_000)).toBe("3 h ago");
-    expect(at(2 * 86_400_000)).toBe("2 d ago");
+  it("returns null for valid text", () => {
+    expect(noteTextError(" hi ")).toBeNull();
   });
 });

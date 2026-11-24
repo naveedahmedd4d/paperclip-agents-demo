@@ -21,15 +21,7 @@ export function countLabel(notes: NoteList): string {
   return `${notes.length} ${notes.length === 1 ? "note" : "notes"}`;
 }
 
-const MINUTE_MS = 60_000;
-const HOUR_MS = 60 * MINUTE_MS;
-const DAY_MS = 24 * HOUR_MS;
-
-/** Short relative time for a note, e.g. "just now", "5 min ago", "2 h ago", "3 d ago". */
-export function formatCreatedAt(note: Note, now: number = Date.now()): string {
-  const elapsed = Math.max(0, now - note.createdAt);
-  if (elapsed < MINUTE_MS) return "just now";
-  if (elapsed < HOUR_MS) return `${Math.floor(elapsed / MINUTE_MS)} min ago`;
-  if (elapsed < DAY_MS) return `${Math.floor(elapsed / HOUR_MS)} h ago`;
-  return `${Math.floor(elapsed / DAY_MS)} d ago`;
+/** Returns an error message for invalid note text, or null when valid. */
+export function noteTextError(text: string): string | null {
+  return text.trim().length === 0 ? "Note text must not be empty" : null;
 }
