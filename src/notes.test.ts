@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addNote, countLabel } from "./notes";
+import { addNote, countLabel, filterNotes } from "./notes";
 
 describe("addNote", () => {
   it("appends a trimmed note without mutating the input", () => {
@@ -26,5 +26,23 @@ describe("countLabel", () => {
 
   it("uses plural for several notes", () => {
     expect(countLabel(addNote(addNote([], "a", 1), "b", 2))).toBe("2 notes");
+  });
+});
+
+describe("filterNotes", () => {
+  const notes = addNote(addNote([], "Buy Milk", 1), "Call mom", 2);
+
+  it("matches case-insensitively by substring", () => {
+    expect(filterNotes(notes, "milk").map((n) => n.text)).toEqual(["Buy Milk"]);
+    expect(filterNotes(notes, "CALL").map((n) => n.text)).toEqual(["Call mom"]);
+  });
+
+  it("returns all notes for a blank query", () => {
+    expect(filterNotes(notes, "  ")).toHaveLength(2);
+  });
+
+  it("returns an empty list when nothing matches and does not mutate input", () => {
+    expect(filterNotes(notes, "zzz")).toHaveLength(0);
+    expect(notes).toHaveLength(2);
   });
 });

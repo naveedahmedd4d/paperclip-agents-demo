@@ -20,3 +20,10 @@ export function addNote(notes: NoteList, text: string, now: number = Date.now())
 export function countLabel(notes: NoteList): string {
   return `${notes.length} ${notes.length === 1 ? "note" : "notes"}`;
 }
+
+/** Case-insensitive substring filter. A blank query returns all notes. */
+export function filterNotes(notes: NoteList, query: string): NoteList {
+  const needle = query.trim().toLowerCase();
+  if (needle.length === 0) return notes;
+  return notes.filter((note) => note.text.toLowerCase().includes(needle));
+}
