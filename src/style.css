@@ -1,5 +1,30 @@
-@import "./landing.css";
-:root { color-scheme: dark; --fg: #e8e8e6; --bg: #121214; --accent: #8c9eff; font-family: system-ui, sans-serif; }
+@import "./notes-ui.css";
+
+:root {
+  color-scheme: dark;
+  --fg: #e8e8e6;
+  --bg: #121214;
+  --accent: #8c9eff;
+  --on-accent: #0d0e14;
+  --muted: #a3a3ab;
+  --surface: #1a1a1f;
+  --line: #2a2a31;
+  --line-strong: #4a4a54;
+  --danger: #ff8f8f;
+  --radius-sm: 6px;
+  --space-1: 0.35rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.75rem;
+  --space-5: 3rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.2rem;
+  --notes-max-width: 60rem;
+  --duration-fast: 150ms;
+  font-family: system-ui, sans-serif;
+}
 body { margin: 0; background: var(--bg); color: var(--fg); }
 main { max-width: 40rem; margin: 3rem auto; padding: 0 1rem; }
 #note-list { padding-left: 1.2rem; }
